@@ -1,0 +1,67 @@
+DATA LOADING — ORACLE SQL*LOADER
+
+
+This project uses Oracle SQL*Loader to load the cleaned healthcare
+dataset into the Oracle database.
+
+Prerequisites:
+
+1. Oracle Database must be installed and running.
+2. The required database user/schema must exist.
+3. SQL*Loader must be available.
+4. The corresponding .ctl files must be present in the ctl/ folder.
+5. Update the database connection details before execution.
+
+Directory Structure
+
+Data_loading.txt
+ctl/
+├── doctors.ctl
+├── hospitals.ctl
+├── insurance_providers.ctl
+├── patients.ctl
+└── admissions.ctl
+
+
+Loading Commands
+----------------
+
+1. Load Doctors
+
+sqlldr userid=hospital_analytics/YourPasswordHere@<your_tns> \
+control=ctl/doctors.ctl log=doctors.log
+
+
+2. Load Hospitals
+
+sqlldr userid=hospital_analytics/YourPasswordHere@<your_tns> \
+control=ctl/hospitals.ctl log=hospitals.log
+
+
+3. Load Insurance Providers
+
+sqlldr userid=hospital_analytics/YourPasswordHere@<your_tns> \
+control=ctl/insurance_providers.ctl log=insurance_providers.log
+
+
+4. Load Patients
+
+sqlldr userid=hospital_analytics/YourPasswordHere@<your_tns> \
+control=ctl/patients.ctl log=patients.log
+
+
+5. Load Admissions
+
+sqlldr userid=hospital_analytics/YourPasswordHere@<your_tns> \
+control=ctl/admissions.ctl log=admissions.log
+
+
+Replace:
+
+YourPasswordHere
+<your_tns>
+
+with your local Oracle database credentials and TNS connection.
+
+The data should be cleaned and prepared before running the SQL*Loader
+commands.
