@@ -512,21 +512,6 @@ Configure the local Oracle connection if required and refresh the data. Apply th
 
 ---
 
-# 📊 Project Status
-
-| Component                | Status      |
-| ------------------------ | ------------ |
-| Python Data Cleaning     | ✅ Completed |
-| Oracle Database Design   | ✅ Completed |
-| Database Schema          | ✅ Completed |
-| SQL*Loader               | ✅ Completed |
-| SQL*Loader Control Files | ✅ Completed |
-| SQL KPI Analysis         | ✅ Completed |
-| Power BI Dashboard       | ✅ Completed |
-| DAX Measures             | ✅ Completed |
-| Dashboard Screenshots    | ✅ Completed |
-
----
 
 # 👤 Author
 
