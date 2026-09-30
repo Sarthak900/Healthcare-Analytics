@@ -17,7 +17,7 @@ The project follows a complete data analytics workflow:
 * Load cleaned CSV data into Oracle using SQL*Loader.
 * Perform healthcare and revenue analysis using Oracle SQL.
 * Calculate important business KPIs.
-* Build an interactive Power BI dashboard.
+* Build an interactive Power BI dashboard with DAX measures.
 * Demonstrate an end-to-end data analytics workflow.
 
 ---
@@ -31,6 +31,7 @@ The project follows a complete data analytics workflow:
 * **SQL*Loader**
 * **Oracle Client / ODAC**
 * **Power BI Desktop**
+* **DAX**
 * **GitHub**
 
 ---
@@ -58,7 +59,8 @@ Healthcare-Analytics/
 │       └── admissions.ctl
 │
 ├── Power BI/
-│   └── Healthcare_Analytics.pbix
+│   ├── Healthcare_Analytics.pbix
+│   └── Healthcare_Analytics_Theme.json
 │
 ├── Python/
 │   └── clean_data.py
@@ -153,6 +155,8 @@ Creates the Oracle database user and provides the required privileges for the pr
 
 Creates the database tables, sequences, triggers, constraints, and indexes required for the healthcare analytics system.
 
+> **Note:** Surrogate keys (`doctor_id`, `hospital_id`, `provider_id`, `patient_id`) are generated using `SEQUENCE` objects paired with `BEFORE INSERT` triggers, since Oracle versions prior to 12c do not support `IDENTITY` columns. Each trigger uses a `SELECT ... INTO ... FROM DUAL` pattern rather than a direct sequence assignment, which avoids a known compiler restriction (`PLS-00357`) when a trigger combines a `WHEN` clause with `NEXTVAL`.
+
 ---
 
 # 📥 3. SQL*Loader Data Loading
@@ -202,6 +206,8 @@ Oracle Database Tables
 SQL Analysis
 ```
 
+Dimension tables are loaded first (Doctors, Hospitals, Insurance Providers, Patients), followed by the Admissions fact table last, since it holds foreign keys into all four dimension tables.
+
 ---
 
 # 📊 4. Oracle SQL KPI Analysis
@@ -247,29 +253,74 @@ The SQL analysis demonstrates the use of:
 * Percentage Calculations
 * Ranking and Top-N Analysis
 
+### Key Insights
+
+* **54,966 admissions** generated **$1.40B** in total billed revenue, averaging **$25,540** per admission.
+* Revenue is nearly **evenly split across Emergency, Elective, and Urgent** admission types — no single admission type dominates.
+* **Diabetes and Obesity** are the highest cost-burden conditions, each accounting for roughly **$236M** in total billing.
+* Insurance revenue is spread across 5 providers (Cigna, Medicare, Blue Cross, UnitedHealthcare, Aetna) with a fairly balanced payer mix — no provider holds a dominant share.
+* Patient demographics are close to evenly split by gender (~50/50), with admissions spread across all age brackets.
+
 ---
 
 # 📈 5. Power BI Dashboard
 
-Power BI is used to create an interactive healthcare analytics dashboard.
+Power BI is used to create an interactive healthcare analytics dashboard, connected directly to the Oracle database.
 
-The dashboard is designed to provide insights into:
+### Dashboard Overview
 
-* Patient volume
-* Revenue
-* Hospital performance
-* Medical conditions
-* Admission types
-* Patient demographics
-* Insurance providers
-* Length of stay
-* Test results
+![Dashboard Overview](screenshots/overview.png)
 
-The Power BI project file will be available in:
+### Dashboard Components
 
-```text
-Power BI/Healthcare_Analytics.pbix
+* **KPI Cards** — Total Revenue, Total Admissions, Average Billing, Average Length of Stay
+* **Revenue Trend** — monthly revenue line chart
+* **Admission Type Split** — donut chart of revenue by admission type
+* **Top Conditions by Cost** — treemap of billing by medical condition
+* **Insurance Provider Revenue** — bar chart by provider
+* **Top Hospitals by Revenue** — bar chart, top 10
+* **Admissions by Gender** — summary table
+* **Slicers** — Admission Type, Date of Admission (range)
+
+### DAX Measures
+
+Rather than relying on Power BI's default implicit aggregations, the dashboard uses explicit DAX measures:
+
+```dax
+Total Revenue = SUM(admissions[billing_amount])
+
+Total Admissions = COUNTROWS(admissions)
+
+Avg Billing = AVERAGE(admissions[billing_amount])
+
+Avg Length of Stay = AVERAGE(admissions[length_of_stay])
+
+% of Total Revenue =
+DIVIDE(
+    SUM(admissions[billing_amount]),
+    CALCULATE(SUM(admissions[billing_amount]), ALL(admissions))
+)
 ```
+
+The `% of Total Revenue` measure uses `ALL(admissions)` to clear the current filter context, so each hospital/provider's share is always calculated against the true grand total rather than whatever slicer selection is active — this measure is surfaced in the tooltips of the Insurance Provider and Top Hospitals charts.
+
+### Custom Theme
+
+A custom Power BI theme (`Power BI/Healthcare_Analytics_Theme.json`) defines a consistent teal/navy color palette, card styling, and page background across all visuals.
+
+### Screenshots
+
+**Revenue Analysis** — monthly trend, admission type split, insurance provider revenue
+
+![Revenue Analysis](screenshots/revenue_analysis.png)
+
+**Hospital & Condition Analysis** — top hospitals by revenue, top conditions by cost
+
+![Hospital Analysis](screenshots/hospital_analysis.png)
+
+**Patient Analysis** — admissions by gender
+
+![Patient Analysis](screenshots/patient_analysis.png)
 
 ### Power BI Data Connection
 
@@ -409,7 +460,7 @@ Open:
 Power BI/Healthcare_Analytics.pbix
 ```
 
-Configure the local Oracle connection if required and refresh the data.
+Configure the local Oracle connection if required and refresh the data. Apply the custom theme via **View → Themes → Browse for themes** and select `Healthcare_Analytics_Theme.json`.
 
 ---
 
@@ -451,26 +502,29 @@ Configure the local Oracle connection if required and refresh the data.
 
 ### Power BI
 
-* Data Connection
+* Data Connection (Oracle → Power BI via ODAC)
+* DAX Measures & Filter Context (`CALCULATE`, `ALL`, `DIVIDE`)
 * Data Visualization
 * KPI Dashboards
-* Interactive Analysis
+* Interactive Slicers
+* Custom Theming
 * Healthcare Analytics
 
 ---
 
 # 📊 Project Status
 
-| Component                | Status         |
-| ------------------------ | -------------- |
-| Python Data Cleaning     | ✅ Completed    |
-| Oracle Database Design   | ✅ Completed    |
-| Database Schema          | ✅ Completed    |
-| SQL*Loader               | ✅ Completed    |
-| SQL*Loader Control Files | ✅ Completed    |
-| SQL KPI Analysis         | ✅ Completed    |
-| Power BI Dashboard       | 🚧 In Progress |
-| Dashboard Screenshots    | 🚧 To Be Added |
+| Component                | Status      |
+| ------------------------ | ------------ |
+| Python Data Cleaning     | ✅ Completed |
+| Oracle Database Design   | ✅ Completed |
+| Database Schema          | ✅ Completed |
+| SQL*Loader               | ✅ Completed |
+| SQL*Loader Control Files | ✅ Completed |
+| SQL KPI Analysis         | ✅ Completed |
+| Power BI Dashboard       | ✅ Completed |
+| DAX Measures             | ✅ Completed |
+| Dashboard Screenshots    | ✅ Completed |
 
 ---
 
@@ -484,7 +538,7 @@ B.Tech — Electronics & Telecommunication Engineering
 
 * Python
 * SQL / Oracle SQL
-* Power BI
+* Power BI / DAX
 * Excel
 * Data Analysis
 * Database Design
