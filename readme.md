@@ -312,15 +312,15 @@ A custom Power BI theme (`Power BI/Healthcare_Analytics_Theme.json`) defines a c
 
 **Revenue Analysis** — monthly trend, admission type split, insurance provider revenue
 
-![Revenue Analysis](screenshots/revenue_analysis.png)
+![Revenue Analysis](Screenshots/revenue_analysis.png)
 
 **Hospital & Condition Analysis** — top hospitals by revenue, top conditions by cost
 
-![Hospital Analysis](screenshots/hospital_analysis.png)
+![Hospital Analysis](Screenshots/hospital_analysis.png)
 
 **Patient Analysis** — admissions by gender
 
-![Patient Analysis](screenshots/patient_analysis.png)
+![Patient Analysis](Screenshots/patient_analysis.png)
 
 ### Power BI Data Connection
 
